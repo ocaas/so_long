@@ -6,7 +6,7 @@
 /*   By: olopez-s <olopez-s@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 01:19:55 by olopez-s          #+#    #+#             */
-/*   Updated: 2025/01/16 05:03:42 by olopez-s         ###   ########.fr       */
+/*   Updated: 2025/01/17 01:29:59 by olopez-s         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,6 +60,35 @@ int on_keypress(int keysym, t_data *data)
     return (0);
 }
 
+void draw_square(t_data *data, int x, int y, int size, int color)
+{
+    int i, j;
+    char *pixel;
+    int bpp, line_size, endian;
+
+    // Create a new image
+    void *img = mlx_new_image(data->mlx_ptr, size, size);
+
+    // Get image data address
+    pixel = mlx_get_data_addr(img, &bpp, &line_size, &endian);
+
+    // Draw the square pixel by pixel
+    for (i = 0; i < size; i++)
+    {
+        for (j = 0; j < size; j++)
+        {
+            int pixel_offset = (i * line_size) + (j * (bpp / 8));
+            *(int *)(pixel + pixel_offset) = color; // Set pixel color
+        }
+    }
+
+    // Put the image onto the window
+    mlx_put_image_to_window(data->mlx_ptr, data->win_ptr, img, x, y);
+
+    // Destroy the image to free memory
+    mlx_destroy_image(data->mlx_ptr, img);
+}
+
 int main(void)
 {
 	t_data data;
@@ -77,6 +106,8 @@ int main(void)
 	// Register destroy hook
 	mlx_hook(data.win_ptr, DestroyNotify, StructureNotifyMask, &on_destroy, &data);
 
+	draw_square(&data, 100, 100, 50, 0xFF0000);
+	
 	// Loop over the MLX pointer
 	mlx_loop(data.mlx_ptr);
 	return (0);
